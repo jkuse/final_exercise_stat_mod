@@ -1,0 +1,28 @@
+########################################################################
+## Introducao a Modelagem Estatistica no R                            ##
+## Exercicio Final                                                    ##
+########################################################################
+
+# Dados: RIKZRichness.txt
+# Estudo de caso: Capitulo 27 - Zuur et al 2007.
+# Descricao: Riqueza da fauna bentonica em uma praia na Holanda e sua relacao com variaveis abioticas;
+
+# Orientacoes: 
+# 1. Leia o capitulo referente ao estudo de caso.
+# 2. Identifique as variaveis resposta e explanatorias.
+# 3. Identifique a pergunta.
+# 4. Apresente uma analise exploratoria de dados.
+# 5. Apresente um procedimento de construcao e selecao de modelos (entre o que vimos).
+# 6. Apresente uma validacao de modelos (quando possivel).
+# 7. Apresente uma conclusao.
+
+# Atencao: 
+# 1. O ideal eh NAO repetir as analises sugeridas no capitulo referencia, mas se vc assim preferir, ok...
+# 2. O ideal eh fazer algo SIMPLIFICADO, mas coerente com o que vimos.
+# 3. NAO se preocupe em fazer a abordagem CERTA. O importante eh fazer algo e justificar porque fez assim.
+
+# Apresentacao em um codigo no R:
+# 1. Basta apresentar brevemente as variaveis e a pergunta (talvez algum detalhe amostral importante).
+# 2. Basta apresentar o codigo no R.
+
+# Ah, divirtam-se :)
