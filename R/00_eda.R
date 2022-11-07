@@ -30,7 +30,6 @@ qqPlot(rikz$Richness, dist = "pois", lambda = mean(rikz$Richness))
 qqPlot(rikz$Richness, distribution = "nbinom", size=5, prob=0.5)
 ### parece que a biomial negativa acomoda melhor a sobredispersão dos dados
 
-
 ### Histogramas
 ggplot(rikz, aes(Richness)) +
   geom_histogram(bins = 10) +
