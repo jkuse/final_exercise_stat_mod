@@ -9,74 +9,60 @@ library(beeswarm)
 rikz <- read.table(file.choose(), header = T)
 head(rikz)
 str(rikz)
+summary(rikz)
 
+### com os dados RIKZ, a nossa pergunta é: quais fatores abióticos influenciam a riqueza de fauna bentonica em uma praia?
 ### varáivel resposta é Richness -> dados discretos/de contagem
 ### duas distribuições possíveis são poisson e binomial negativa
 ### sendo que binomial negativa suporta maior dispersão dos dados
 ### na dist possion média = variância
+### a natureza da variável resposta (Richness) pode ser uma boa forme de saber a distribuição dos resíduos
+### portanto, vamos explorar os dados
 
 ### QQ-plot poisson
 qqPlot(rikz$Richness, dist = "pois", lambda = mean(rikz$Richness))
 
-### parece que possion é um distribuição razoável para a variável resposta, com apenas dois pontos
-### que poderiam ser outliers
-### seria adequado criar modelos para as distribuições poisson e com distribuição binomial negativa
-### e depois validar os modelos
+### parece que possion é um distribuição razoável para a variável resposta, com apenas dois pontos que poderiam ser outliers
+### seria adequado criar modelos para as distribuições poisson e distribuição binomial negativa e depois validar os modelos
+
+### QQ-plot Biomial Negativa
+qqPlot(rikz$Richness, distribution = "nbinom", size=5, prob=0.5)
+### parece que a biomial negativa acomoda melhor a sobredispersão dos dados
 
 
 ### Histogramas
 ggplot(rikz, aes(Richness)) +
   geom_histogram(bins = 10) +
   xlab("Richness")
-?geom_histogram
 
-### Cleveland dotplot
-dotchart(rikz$Richness)
-
-### identificando outliers
+### identificando possíveis outliers 
+dotchart(rikz$Richness) ### richness no eixo x
+plot(rikz$Richness)
 boxplot(rikz$Richness)
+boxplot(rikz$Richness)$stat
 beeswarm::beeswarm(rikz$Richness, col="red", pch=16, method="swarm")
 
-ggplot(rikz, aes(y = Richness)) +
-  geom_boxplot(alpha=0.5)
 
 plot(density(rikz$Richness))
+### plotando a linha de densidade sobre o histograma
+hist(rikz$Richness, probability = T)
+lines(density(rikz$Richness))
 
-# par(mfrow = c(1,3))
-# ggplot(rikz, aes(x = NAP, y = Richness)) +
-#   geom_boxplot(alpha = 0.5) + xlab("NAP") + ylab("Richness")
-# ggplot(rikz, aes(x = Beach, y = Richness)) + 
-#   geom_boxplot(alpha = 0.5) + xlab("Beach") + ylab("Richness")
-# ggplot(rikz, aes(x = exposure, y = Richness)) + 
-#   geom_boxplot(alpha = 0.5) + xlab("Exposure") + ylab("Richness")
-# par(mfrow = c(1,1))
-
-
-### Diagrama de dispersão Riqueza ~ NAP
+### Diagrama de dispersão Riqueza ~ NAP -> ver a relação dee NAP com Richness
 plot(rikz$Richness ~ rikz$NAP)
+### quando a riqueza é maior, se tem uma maior variância dos dados
 
-boxplot(rikz$Richness ~ rikz$Beach)
-boxplot(rikz$Richness ~ rikz$exposure)
-
-
-### transformando variáveis explanatórias em fatores
+### transformando algumas variáveis explanatórias em fatores
 rikz$fexposure <- as.factor(rikz$exposure)
 rikz$fbeach <- as.factor(rikz$Beach)
-rikz$fNAP <- as.factor(rikz$NAP)
-rikz$fangle1 <- as.factor(rikz$angle1)
-rikz$fangle2 <- as.factor(rikz$angle2)
-rikz$fsalinity <- as.factor(rikz$salinity)
-rikz$ftemperature <- as.factor(rikz$temperature)
-rikz$fpenetrability <- as.factor(rikz$penetrability)
-rikz$fgrainsize <- as.factor(rikz$grainsize)
-rikz$fhumus <- as.factor(rikz$humus)
+rikz$fweek <- as.factor(rikz$Week)
 
 write.csv(rikz, file="data/processed/frikz", sep=";")
 ### existe correlação entre variáveis explanatórias?
-exp <- as.data.frame(rikz[,14:23])
+exp <- as.data.frame(rikz[,4:14])
 pairs(exp, panel=panel.smooth)
 
-# Funcao encontrada no help da funcao 'pairs' para plotar histogramas
+# Função encontrada no help de 'pairs' para plotar histogramas
 panel.hist <- function(x, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
@@ -89,7 +75,7 @@ panel.hist <- function(x, ...)
 
 pairs(exp, diag.panel=panel.hist)
 
-# Outra funcao para fornecer os coeficientes de correlacao com a fonte proporcional ao indice
+# Função para fornecer os coeficientes de correlacao com a fonte proporcional ao indice
 panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
@@ -103,5 +89,16 @@ panel.cor <- function(x, y, digits=2, prefix="", cex.cor, ...)
 
 pairs(exp, panel = panel.smooth, diag.panel=panel.hist, lower.panel = panel.cor)
 
-### Parece que exposure e temperatura estão correlacionadas, bem como praia e salinidade
+### Parece que exposure e temperatura estão correlacionadas, bem como praia e salinidade, agle2 e grainsize
+### e week e praia
 
+### ajustando o modelo linear para ver os resíduos
+mlm <- lm(Richness ~ NAP, data = rikz)
+resid <- resid(mlm)
+resid
+plot(resid)
+hist(resid)
+
+par(mfrow = c(2,2))
+plot(mlm)
+par(mfrow  = c(1,1))
