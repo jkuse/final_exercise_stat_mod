@@ -19,6 +19,7 @@ summary(rikz)
 ### a natureza da variável resposta (Richness) pode ser uma boa forme de saber a distribuição dos resíduos
 ### portanto, vamos explorar os dados
 
+par(mfrow = c(1,2))
 ### QQ-plot poisson
 qqPlot(rikz$Richness, dist = "pois", lambda = mean(rikz$Richness))
 
@@ -98,7 +99,10 @@ resid <- resid(mlm)
 resid
 plot(resid)
 hist(resid)
+lresid <- as.list(resid)
 
 par(mfrow = c(2,2))
 plot(mlm)
 par(mfrow  = c(1,1))
+
+qqPlot(resid, distribution = 'pois', lambda = mean(lresid))
