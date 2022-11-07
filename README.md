@@ -18,5 +18,3 @@ In the `figs` directory you will find the graphs and maps generated with the scr
 In the `R` directory you will find the scripts.  
 
 * Zuur, Alain F., Elena N. Ieno, and Graham M. Smith. Analysing ecological data. Vol. 680. New York: Springer, 2007.
-
-oi 
