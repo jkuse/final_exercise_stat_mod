@@ -1,4 +1,4 @@
-### agora, vamos utilizar glmms
+### Agora, vamos utilizar glmms
 ### não vamos usar lmm pois a distribuição da variável resposta não é normal, portanto, precisamos
 ### de uma generalização do modelo
 
@@ -20,7 +20,7 @@ library(DHARMa)
 rikz <- read.csv("data/processed/frikz")
 
 ### montando um modelo misto com intercepto aletório
-### NAP de variável explanatória e Beach como variável aleatória
+### utilizando NAP como variável explatória e Beach como variável aleatória
 (m1 <- glmmTMB(Richness ~ NAP + (1|fbeach),
                family=poisson, data=rikz, REML = T))
 summary(m1)
@@ -30,49 +30,60 @@ summary(m1)
                family = poisson, data = rikz, REML = T))
 summary(m2)
 
+### agora um modelo apenas com inclinação aleatória
+(m3 <- glmmTMB(Richness ~ NAP + (NAP | fbeach),
+               family = poisson, data = rikz, REML = T))
+summary(m3)
+
+anova(m1,m2,m3)
+
+### testando com distribuição binomial negativa
+(m4 <- glmmTMB(Richness ~ NAP + (1|fbeach),
+               family=, data=rikz, REML = T))
+summary(m4)
+
+### agora um modelo com intercepto e inclinação aleatórios
+(m5 <- glmmTMB(Richness ~ NAP + (1 + NAP | fbeach),
+               family = poisson, data = rikz, REML = T))
+summary(m5)
+
+### agora um modelo apenas com inclinação aleatória
+(m6 <- glmmTMB(Richness ~ NAP + (NAP | fbeach),
+               family = poisson, data = rikz, REML = T))
+summary(m6)
+
 ### testando os componentes fixos por máxima verossimilhança
 
-fm1 <- glm(Richness ~ NAP + fexposure + humus + angle2 + fbeach,
+fm1 <- glmmTMB(Richness ~ NAP + fexposure + Week + angle1 + angle2 + salinity + grainsize + (1 | fbeach),
            family = poisson,
-           data = rikz)
+           data = rikz,
+           REML = F)
 summary(fm1)
 
-drop1(fm1, test = "Chi")
-
-fm2 <- glm(Richness ~ NAP + fexposure + humus + fbeach,
-           family = poisson,
-           data = rikz)
+fm2 <- glmmTMB(Richness ~ NAP + fexposure + Week + angle2 + salinity + grainsize + (1 | fbeach),
+               family = poisson,
+               data = rikz,
+               REML = F)
 summary(fm2)
 
-drop1(fm2, test = "Chi")
+model.sel(fm1, fm2)
 
-fm3 <- glm(Richness ~ NAP + fexposure + humus, 
-           family = poisson,
-           data = rikz)
-summary(fm3)
-
-drop1(fm3, test = "Chi")
-
-fm4 <- glm(Richness ~ NAP + fexposure,
-           family = poisson,
-           data = rikz)
-summary(fm4)
-
-model.sel(fm1, fm2, fm3, fm4)
-
-### fm3 parece ser o modelo com componentes fixos mais perto do ótimo
+### os dois modelos apresentam um delta AIC menor que 2, portando, ambos podem ser válidos
 ### validar com DHARMA
 
-# Calcular os residuos
-simulationOutput <- simulateResiduals(fittedModel = fm3, n = 1000)
-residuals(simulationOutput)
+# Calcular os residuos de fm1
+simulationOutput1 <- simulateResiduals(fittedModel = fm1, n = 1000)
+residuals(simulationOutput1)
 
-# Testando dispersao
-testDispersion(simulationOutput, type = "PearsonChisq")
+# Testando dispersao de fm1
+testDispersion(simulationOutput1, type = "PearsonChisq")
+plot(simulationOutput1)
 
-plot(simulationOutput)
+### Calcular resíduos de fm2
+simulationOutput2 <- simulateResiduals(fittedModel = fm2, n = 1000)
+residuals(simulationOutput2)
 
-### Não tá muito bom o modelo
-### Vamos tentar validar adicionando o componente aleatório
-
+# Testando dispersao fm2
+testDispersion(simulationOutput2, type = "PearsonChisq")
+plot(simulationOutput2)
 
